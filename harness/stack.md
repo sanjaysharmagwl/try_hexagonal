@@ -17,6 +17,8 @@ This document captures the technical stack and conventions for the Idea Manageme
 
 ### Development Dependencies
 - **pytest**: Test runner
+- **pytest-cov**: Coverage plugin
+- **ruff**: Linter and formatter
 
 ## Project Structure
 
@@ -33,8 +35,11 @@ try_hexagonal/
 │       ├── repository.py   # Repository interface and in-memory implementation
 │       ├── router.py       # HTTP adapter (FastAPI routes)
 │       └── schemas.py      # API request/response DTOs
-├── tests/                  # Test directory (currently empty)
-├── test_domain.py          # Domain tests at root (to be moved to tests/)
+├── tests/                  # Test directory
+│   └── unit/               # Unit tests (domain tests live here)
+├── tools/cp/               # CP workflow CLI
+├── harness/                # Standards, workflow, templates, checks
+├── proposals/              # Change Proposals
 └── knowledge/              # Architecture documentation
 ```
 
@@ -55,25 +60,24 @@ Key principles observed:
 ## Testing
 
 - **Test Runner**: pytest
-- **Test Location**: Currently tests are at root (test_domain.py), tests/ directory exists but empty
+- **Test Location**: `tests/unit/` for domain/unit tests; `tools/cp/tests/` and `harness/checks/tests/` for tooling tests
 - **Test Style**: pytest with plain assertions
-- **Coverage**: No coverage tool configured
+- **Coverage**: pytest-cov, reported in CI (`--cov=app --cov=tools/cp`); must not decrease
 - **Current Tests**: Domain entity behavior tests (status transitions)
 
 ## Code Quality Tools
 
-**Open Question**: No linting or formatting tools configured. Consider adding:
-- **ruff**: Fast Python linter and formatter (recommended for modern Python projects)
-- **mypy**: Static type checking (aligns with Pydantic/TypeScript-style development)
-- **pre-commit**: Git hooks for automation
+- **ruff**: Linter and formatter (selected rules: E, F, I, B, UP; B008 ignored for FastAPI `Depends`; line-length 100; target py312)
+- **pytest-cov**: Coverage reporting (`--cov=app --cov=tools/cp`)
+- **pre-commit**: Minimal local hooks (ruff format, ruff check, `cp lint` on proposals); install via `uvx pre-commit install`
+- Type checking (mypy) is not adopted — candidate for a future CP
 
 ## CI/CD
 
-**Open Question**: No CI/CD configured. Repository is not yet a git repository.
-Consider:
-- GitHub Actions (if using GitHub)
-- GitLab CI (if using GitLab)
-- Need to initialize git repository
+- **GitHub Actions** (`.github/workflows/ci.yml`):
+  - `checks` job: ruff format check, ruff lint, pytest with coverage, `cp lint`, `harness/checks/run_all.py`
+  - `cp-reference` job (PRs only): verifies a non-trivial PR references an In-Progress CP
+- Coverage must not decrease; 80% overall target <!-- inferred: confirm -->
 
 ## Documentation
 
@@ -93,16 +97,24 @@ uv run uvicorn main:app --reload
 # Run tests
 uv run pytest
 
-# Run specific test file
-uv run pytest test_domain.py
+# Run tests with coverage
+uv run pytest --cov=app --cov=tools/cp
+
+# Lint and format
+uv run ruff check .
+uv run ruff format --check .
+
+# CP tooling
+python3 tools/cp/cp lint
+python3 harness/checks/run_all.py
 ```
 
 ## Git
 
-**Open Question**: Repository is not initialized as a git repository.
-- No .gitignore at project root
-- No branching strategy defined
-- No commit conventions defined
+- Repository initialized; `main` is the default branch
+- `uv.lock` is committed (reproducible installs and audits)
+- Branch naming: `cp-XXXX-short-description`; commit format: `<type>: <subject> (CP-XXXX, T-YYY, REQ-ZZZ)`
+- See `harness/standards/git.md` for the full conventions
 
 ## Conventions Inferred
 
@@ -134,9 +146,14 @@ uv run pytest test_domain.py
 
 ## Assumptions
 
-- Repository will be initialized as a git repository during this CP workflow setup
-- CI will be GitHub Actions (most common for GitHub-hosted repos, adjust if different)
-- ruff will be adopted as the linter/formatter (modern, fast, all-in-one)
-- mypy will be added for type checking (aligns with existing type hinting)
-- Tests will be organized under tests/ directory following pytest conventions
+- CP-0001 bootstrap gate approvals are pending human confirmation
+- ruff rule set chosen (E, F, I, B, UP); B008 ignored for FastAPI `Depends`
+- `cp status --by` is an honor-system human-gate record, not authentication
+- Type checking (mypy) is not adopted — candidate for a future CP
 - Open questions will be answered by humans during the CP-0001 approval process
+
+## Remaining Open Questions
+
+- Coverage threshold (80% is provisional) <!-- inferred: confirm -->
+- Branch protection for `main` must be configured in the GitHub UI (cannot be done from the repo)
+- The `cp-reference` CI rule relies on the PR body/title/labels — it is advisory for edge cases it cannot see

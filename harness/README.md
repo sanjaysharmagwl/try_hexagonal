@@ -30,17 +30,36 @@ For agents:
 
 To create a new Change Proposal:
 ```bash
-tools/cp/cp new "Your proposal title"
+python3 tools/cp/cp new "Your proposal title"
 ```
 
 To lint a proposal:
 ```bash
-tools/cp/cp lint <id>
+python3 tools/cp/cp lint <id>
 ```
 
 To see the next task in a plan:
 ```bash
-tools/cp/cp next <id>
+python3 tools/cp/cp next <id>
+```
+
+(All commands can also be run as `uv run python tools/cp/cp ...`.)
+
+See `proposals/0001-adopt-change-proposal-process/` for a complete worked example.
+
+## Checks
+
+Executable standards enforcement lives in `harness/checks/`:
+
+- `check_architecture.py` — layering/boundary rules
+- `check_banned_patterns.py` — wildcard imports, bare except, print/breakpoint
+- `check_secrets.py` — committed-secret scan
+- `check_templates_sync.py` — templates in sync with `proposals/0000-template/`
+- `check_pr_reference.py` — CI-only: PR must reference an In-Progress CP (not run by run_all)
+
+Run all local checks:
+```bash
+python3 harness/checks/run_all.py
 ```
 
 ## File Structure
