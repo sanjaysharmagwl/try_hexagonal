@@ -65,7 +65,7 @@ Documentation-only edits, one task per document group, committed per task on bra
 
 ### T-004: Git standard
 
-- **Status**: todo
+- **Status**: done
 - **Requirements**: REQ-005
 - **Depends on**: none
 - **Files**: harness/standards/git.md

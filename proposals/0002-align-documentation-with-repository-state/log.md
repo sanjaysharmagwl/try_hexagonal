@@ -90,6 +90,23 @@ $ python3 tools/cp/cp lint     -> 0 problem(s)
 $ python3 harness/checks/run_all.py -> all checks passed
 ```
 
+### T-004
+
+```
+$ rg -n -i 'rebase' harness/standards/git.md && rg -n 'pull_request_template.md' harness/standards/git.md
+117, 118, 119 (Linear History bullets), 159-160 (rebase alias) matched
+80:Use `.github/pull_request_template.md`; GitHub applies it automatically ...
+
+$ ! rg -n -i 'commit-msg|use merge commits' harness/standards/git.md
+no match
+
+$ uv run ruff format --check .   -> 65 files already formatted
+$ uv run ruff check .          -> All checks passed!
+$ uv run pytest -q             -> 47 passed in 0.31s
+$ python3 tools/cp/cp lint     -> 0 problem(s)
+$ python3 harness/checks/run_all.py -> all checks passed
+```
+
 ## DoD Sign-Off
 
 Status: PENDING

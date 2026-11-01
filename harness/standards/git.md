@@ -77,26 +77,7 @@ Co-Authored-By: Devin <158243242+devin-ai-integration[bot]@users.noreply.github.
 - Example: `feat: add idea approval workflow (CP-0001)`
 
 ### PR Description Template
-```markdown
-## CP Reference
-CP-XXXX: [title]
-
-## Tasks Covered
-- T-001: ...
-- T-002: ...
-
-## Requirements Covered
-- REQ-001: ...
-- REQ-002: ...
-
-## Checklist
-- [ ] All tests pass
-- [ ] ruff format applied
-- [ ] ruff check passes
-- [ ] Coverage maintained
-- [ ] Documentation updated
-- [ ] log.md updated
-```
+Use `.github/pull_request_template.md`; GitHub applies it automatically and it is the single source of truth for PR descriptions.
 
 ### PR Requirements
 - Must reference a CP in `In-Progress` state
@@ -133,9 +114,9 @@ CP-XXXX: [title]
 ## History
 
 ### Linear History
-- Use merge commits (not rebase)
-- Keep history clean
-- Avoid force pushing
+- Merge PRs with rebase-merge (GitHub "Rebase and merge"); no merge commits and no squash merges
+- Rebase-merge keeps every per-task commit (CP-XXXX, T-YYY, REQ-ZZZ) on `main`, preserving traceability
+- Rebase your branch onto `main` before merging; force-push only your own feature branch (`--force-with-lease`), never `main`
 
 ### Reverting
 - If a commit needs to be reverted, create a revert commit
@@ -164,9 +145,6 @@ A minimal `.pre-commit-config.yaml` (local hooks only) runs ruff format, ruff ch
 ```bash
 uvx pre-commit install
 ```
-
-### Commit-msg
-Validate commit message format.
 
 ## Commands
 
