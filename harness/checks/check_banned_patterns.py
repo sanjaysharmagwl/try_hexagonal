@@ -1,68 +1,54 @@
-#!/usr/bin/env python3
-"""
-Banned patterns check.
+"""Banned code patterns check.
 
-Enforces coding standards from harness/standards/coding.md:
-- No wildcard imports
-- No bare except clauses
-- No print statements in production code
-- No commented-out code
+Enforces: harness/standards/coding.md
 """
 
-import re
+import ast
 import sys
 from pathlib import Path
 
-BANNED_PATTERNS = [
-    (r"from .* import \*", "Wildcard import"),
-    (r"except\s*:", "Bare except clause"),
-    (r"print\(", "Print statement in production code"),
-]
+BANNED_CALLS = {"print", "breakpoint", "pdb.set_trace"}
 
 
-def check_file(file_path: Path) -> bool:
-    """Check a single file for banned patterns."""
-    with open(file_path) as f:
-        content = f.read()
-
-    all_passed = True
-    for pattern, description in BANNED_PATTERNS:
-        if re.search(pattern, content):
-            print(f"ERROR: {file_path} contains {description}")
-            all_passed = False
-
-    # Check for commented-out code (heuristic)
-    lines = content.split("\n")
-    for i, line in enumerate(lines, 1):
-        stripped = line.strip()
-        if stripped.startswith("#") and any(
-            c in stripped for c in ["=", "def ", "class ", "import "]
-        ):
-            # Skip if it's a comment explaining code
-            if not any(word in stripped.lower() for word in ["todo", "fixme", "hack", "note"]):
-                print(f"WARNING: {file_path}:{i} possible commented-out code: {stripped[:50]}")
-
-    return all_passed
+def _call_name(node):
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        base = _call_name(node.value)
+        return f"{base}.{node.attr}" if base else node.attr
+    return ""
 
 
-def main():
-    """Run banned pattern checks on all Python files."""
-    app_dir = Path("app")
-    if not app_dir.exists():
-        print("ERROR: app/ directory not found")
-        return 1
+def check(root: Path) -> list[str]:
+    """Return banned-pattern violations in app/ and main.py."""
+    violations = []
+    files = list((root / "app").rglob("*.py")) if (root / "app").is_dir() else []
+    if (root / "main.py").exists():
+        files.append(root / "main.py")
+    for f in sorted(files):
+        rel = f.relative_to(root)
+        tree = ast.parse(f.read_text(), filename=str(f))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and any(a.name == "*" for a in node.names):
+                violations.append(f"{rel}:{node.lineno}: wildcard import")
+            if isinstance(node, ast.ExceptHandler) and node.type is None:
+                violations.append(f"{rel}:{node.lineno}: bare except")
+            if isinstance(node, ast.Call) and _call_name(node.func) in BANNED_CALLS:
+                violations.append(f"{rel}:{node.lineno}: banned call {_call_name(node.func)}()")
+    return violations
 
-    all_passed = True
-    for py_file in app_dir.rglob("*.py"):
-        if not check_file(py_file):
-            all_passed = False
 
-    if all_passed:
-        print("OK: Banned pattern checks passed")
-        return 0
-    else:
-        print("FAILED: Banned pattern checks failed")
-        return 1
+def main() -> int:
+    root = Path(__file__).resolve().parents[2]
+    violations = check(root)
+    for v in violations:
+        print(v)
+    print(
+        "OK: banned-pattern checks passed"
+        if not violations
+        else f"FAILED: {len(violations)} violation(s)"
+    )
+    return 1 if violations else 0
 
 
 if __name__ == "__main__":

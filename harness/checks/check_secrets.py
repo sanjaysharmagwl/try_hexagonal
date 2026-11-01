@@ -1,61 +1,60 @@
-#!/usr/bin/env python3
-"""
-Secret scan check.
+"""Committed-secret scan.
 
-Enforces security standards from harness/standards/security.md:
-- No API keys in code
-- No passwords in code
-- No tokens in code
-- No private keys in code
+Enforces: harness/standards/security.md
 """
 
 import re
+import subprocess
 import sys
 from pathlib import Path
 
-SECRET_PATTERNS = [
-    (r"api[_-]?key\s*=\s*['\"][^'\"]{10,}['\"]", "API key"),
-    (r"password\s*=\s*['\"][^'\"]{8,}['\"]", "Password"),
-    (r"token\s*=\s*['\"][^'\"]{20,}['\"]", "Token"),
-    (r"secret\s*=\s*['\"][^'\"]{10,}['\"]", "Secret"),
-    (r"-----BEGIN.*PRIVATE KEY-----", "Private key"),
+PATTERNS = [
+    (re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"), "private key"),
+    (re.compile(r"AKIA[0-9A-Z]{16}"), "AWS access key id"),
+    (
+        re.compile(r"(?i)(api[_-]?key|secret|password|token)\s*[:=]\s*['\"][^'\"]{8,}['\"]"),
+        "hardcoded credential",
+    ),
 ]
+SKIP = {"uv.lock"}
 
 
-def check_file(file_path: Path) -> bool:
-    """Check a single file for secrets."""
-    with open(file_path) as f:
-        content = f.read()
-
-    all_passed = True
-    for pattern, description in SECRET_PATTERNS:
-        matches = re.finditer(pattern, content, re.IGNORECASE)
-        for match in matches:
-            line_num = content[: match.start()].count("\n") + 1
-            print(f"ERROR: {file_path}:{line_num} possible {description}")
-            all_passed = False
-
-    return all_passed
+def tracked_files(root: Path):
+    try:
+        r = subprocess.run(
+            ["git", "ls-files"], cwd=root, capture_output=True, text=True, check=True
+        )
+        return [root / line for line in r.stdout.splitlines() if line.strip()]
+    except Exception:
+        return [p for p in root.rglob("*") if p.is_file() and ".git" not in p.parts]
 
 
-def main():
-    """Run secret scan on all files."""
-    app_dir = Path("app")
-    if not app_dir.exists():
-        print("ERROR: app/ directory not found")
-        return 1
+def check(root: Path) -> list[str]:
+    """Return secret-scan violations across tracked files."""
+    violations = []
+    for f in tracked_files(root):
+        if f.name in SKIP or not f.exists():
+            continue
+        try:
+            text = f.read_text()
+        except (UnicodeDecodeError, ValueError):
+            continue  # binary
+        if "check_secrets" in f.name or ("tests" in f.parts and "fixtures" in f.parts):
+            continue
+        for i, line in enumerate(text.splitlines(), 1):
+            for pat, desc in PATTERNS:
+                if pat.search(line):
+                    violations.append(f"{f.relative_to(root)}:{i}: possible {desc}")
+    return violations
 
-    all_passed = True
-    for py_file in app_dir.rglob("*.py"):
-        if not check_file(py_file):
-            all_passed = False
 
-    if all_passed:
-        print("OK: Secret scan passed")
-        return 0
-    else:
-        print("FAILED: Secret scan failed")
-        return 1
+def main() -> int:
+    root = Path(__file__).resolve().parents[2]
+    violations = check(root)
+    for v in violations:
+        print(v)
+    print("OK: secret scan passed" if not violations else f"FAILED: {len(violations)} violation(s)")
+    return 1 if violations else 0
 
 
 if __name__ == "__main__":

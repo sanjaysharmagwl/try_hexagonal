@@ -6,14 +6,13 @@ A clean hexagonal architecture implementation using uv workspace pattern and Pyd
 
 ```
 try_hexagonal/
-├── pyproject.toml              # Workspace configuration
-├── idea_system/                # Package member
-│   ├── pyproject.toml          # Package configuration
-│   ├── domain/                 # Domain layer
-│   ├── application/            # Application layer
-│   ├── adapters/               # Adapters (inbound/outbound)
-│   └── main.py                 # Composition root
-└── test_domain.py              # Domain tests
+├── pyproject.toml              # Project configuration
+├── main.py                     # Composition root (app entry point)
+├── app/
+│   ├── core/                   # Shared dependencies
+│   └── ideas/                  # Ideas feature (models, service, repository, router, schemas)
+└── tests/
+    └── unit/                   # Domain tests
 ```
 
 ## Setup with uv
@@ -22,15 +21,13 @@ try_hexagonal/
 # Install dependencies
 uv sync
 
-# Install the package in editable mode
-uv pip install -e idea_system
 ```
 
 ## Running the Application
 
 ```bash
 # Start the FastAPI server
-uv run uvicorn idea_system.main:app --reload
+uv run uvicorn main:app --reload
 ```
 
 The API will be available at `http://127.0.0.1:8000`
@@ -39,7 +36,7 @@ The API will be available at `http://127.0.0.1:8000`
 
 ```bash
 # Run domain tests
-uv run pytest test_domain.py
+uv run pytest
 ```
 
 ## API Usage

@@ -11,4 +11,23 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.3",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008"]  # FastAPI Depends() in defaults is idiomatic
+
+[tool.ruff.lint.per-file-ignores]
+# Style-only modernization suppressed: no application behavior changes allowed.
+"app/ideas/models.py" = ["UP042"]
+"app/ideas/router.py" = ["B904"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "tools/cp/tests", "harness/checks/tests"]
+pythonpath = ["."]

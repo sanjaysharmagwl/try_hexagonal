@@ -1,93 +1,86 @@
-#!/usr/bin/env python3
-"""
-Architecture boundary check.
+"""Architecture boundary check.
 
-Enforces dependency rules from harness/standards/architecture.md:
-- Domain layer has no external dependencies
-- Application layer depends only on Domain
-- Adapters depend on Application and Domain
-- No circular dependencies
+Enforces: harness/standards/architecture.md
 """
 
 import ast
+import re
 import sys
 from pathlib import Path
 
 
-def get_imports(file_path: Path) -> set[str]:
-    """Extract all imports from a Python file."""
-    imports = set()
-    try:
-        with open(file_path) as f:
-            tree = ast.parse(f.read(), filename=str(file_path))
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Import):
-                for alias in node.names:
-                    imports.add(alias.name.split(".")[0])
-            elif isinstance(node, ast.ImportFrom):
-                if node.module:
-                    imports.add(node.module.split(".")[0])
-    except Exception:
-        pass
-    return imports
+def imports_of(path: Path):
+    """Return the set of top-level module names imported by a file."""
+    mods = set()
+    tree = ast.parse(path.read_text(), filename=str(path))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for a in node.names:
+                mods.add(a.name)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            mods.add(("." * node.level) + node.module)
+    return mods
 
 
-def check_file(file_path: Path) -> bool:
-    """Check a single file for architecture violations."""
-    # Determine layer based on path
-    path_str = str(file_path)
-    layer = None
+def check(root: Path) -> list[str]:
+    """Return architecture violations under root/app."""
+    violations = []
+    app = root / "app"
+    if not app.is_dir():
+        return violations
+    stdlib = set(sys.stdlib_module_names)
+    for f in sorted(app.rglob("*.py")):
+        rel = f.relative_to(root)
+        parts = f.relative_to(app).parts
+        feature = parts[0] if len(parts) > 1 else None
+        mods = imports_of(f)
+        if any(m == "main" or m.startswith("main.") for m in mods):
+            violations.append(f"{rel}: must not import main")
+        if f.name == "models.py" and feature:
+            allowed = stdlib | {"pydantic", f"app.{feature}.models"}
+            for m in mods:
+                top = m.lstrip(".").split(".")[0]
+                if m not in allowed and top not in stdlib and m != f"app.{feature}.models":
+                    violations.append(
+                        f"{rel}: models.py may only import stdlib, "
+                        f"pydantic, and app.{feature}.models (found {m})"
+                    )
+        if f.name == "service.py":
+            for m in mods:
+                top = m.lstrip(".")
+                if top.split(".")[0] in ("fastapi", "starlette"):
+                    violations.append(f"{rel}: service.py must not import {top}")
+                if (
+                    re.search(r"\.(router|schemas|core)$", top)
+                    or ".router" in top
+                    or ".schemas" in top
+                    or ".core" in top
+                ):
+                    violations.append(
+                        f"{rel}: service.py must not import app.*.router/schemas/core (found {top})"
+                    )
+        if f.name == "repository.py":
+            for m in mods:
+                if m.lstrip(".").split(".")[0] in ("fastapi", "starlette"):
+                    violations.append(f"{rel}: repository.py must not import {m}")
+        if f.name == "router.py":
+            for m in mods:
+                if re.search(r"\.repository$", m.lstrip(".")):
+                    violations.append(f"{rel}: router.py must not import {m}")
+    return violations
 
-    if "app/core/" in path_str or "app/*/models.py" in path_str:
-        layer = "domain"
-    elif "app/*/service.py" in path_str:
-        layer = "application"
-    elif "app/*/router.py" in path_str or "app/*/repository.py" in path_str:
-        layer = "adapter"
 
-    if not layer:
-        return True  # Not a layer file, skip
-
-    imports = get_imports(file_path)
-
-    # Domain layer: no external dependencies except stdlib
-    if layer == "domain":
-        external = [
-            imp
-            for imp in imports
-            if not imp.startswith("app") and imp not in sys.stdlib_module_names
-        ]
-        if external:
-            print(f"ERROR: {file_path} (domain) has external dependencies: {external}")
-            return False
-
-    # Application layer: depends only on domain
-    if layer == "application":
-        has_app = any(imp.startswith("app") for imp in imports)
-        if not has_app:
-            print(f"WARNING: {file_path} (application) has no app dependencies")
-
-    return True
-
-
-def main():
-    """Run architecture checks on all Python files."""
-    app_dir = Path("app")
-    if not app_dir.exists():
-        print("ERROR: app/ directory not found")
-        return 1
-
-    all_passed = True
-    for py_file in app_dir.rglob("*.py"):
-        if not check_file(py_file):
-            all_passed = False
-
-    if all_passed:
-        print("OK: Architecture checks passed")
-        return 0
-    else:
-        print("FAILED: Architecture checks failed")
-        return 1
+def main() -> int:
+    root = Path(__file__).resolve().parents[2]
+    violations = check(root)
+    for v in violations:
+        print(v)
+    print(
+        "OK: architecture checks passed"
+        if not violations
+        else f"FAILED: {len(violations)} violation(s)"
+    )
+    return 1 if violations else 0
 
 
 if __name__ == "__main__":
