@@ -32,7 +32,7 @@ Documentation-only edits, one task per document group, committed per task on bra
 
 ### T-001: README API docs, links, contributing
 
-- **Status**: todo
+- **Status**: done
 - **Requirements**: REQ-001, REQ-002
 - **Depends on**: none
 - **Files**: README.md
