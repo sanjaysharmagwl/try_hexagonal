@@ -87,7 +87,7 @@ Documentation-only edits, one task per document group, committed per task on bra
 
 ### T-006: Knowledge base
 
-- **Status**: todo
+- **Status**: done
 - **Requirements**: REQ-007
 - **Depends on**: T-002
 - **Files**: knowledge/design/architecture.md, knowledge/architecture/README.md, knowledge/architecture/index/002_techincal_writing_framework.md -> 002_technical_writing_framework.md, knowledge/architecture/index/001_adopting_hexagonal_architecture.md

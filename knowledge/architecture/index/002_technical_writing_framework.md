@@ -1,9 +1,9 @@
-# 0001. Use ASD-STE100 writing rules for knowledge management documents
+# 0002. Use ASD-STE100 writing rules for knowledge management documents
 
 - **Status:** Proposed
 - **Date:** 2026-11-01
-- **Deciders:** [names or roles]
-- **Related:** [ADR index, style guide, or tickets once they exist]
+- **Deciders:** Engineering team
+- **Related:** ADR 0001, `harness/standards/docs.md`
 
 ## Context
 
@@ -20,7 +20,6 @@ Facts that cut against this decision:
 - Some rules, such as limits on "-ing" forms, clash with ordinary software vocabulary such as "logging" or "caching" and need project-specific handling.
 - ADRs and design notes need to explain trade-offs and reasoning, and a strict vocabulary can make that prose stilted.
 - Contributors need training, and the standard alone does not check documents. Enforcement needs a tool, and we have not yet selected one.
-- Team size, expected lifespan of the documents, and existing tooling are [to be filled in].
 
 ## Decision
 

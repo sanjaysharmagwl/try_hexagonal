@@ -123,6 +123,36 @@ $ python3 tools/cp/cp lint     -> 0 problem(s)
 $ python3 harness/checks/run_all.py -> all checks passed
 ```
 
+### T-006
+
+```
+$ wc -c knowledge/design/architecture.md knowledge/architecture/README.md
+0 knowledge/design/architecture.md
+0 knowledge/architecture/README.md
+(both empty; removed with git rm)
+
+$ ! ls knowledge/design/architecture.md knowledge/architecture/README.md
+no such files
+
+$ ls knowledge/architecture/index/002_technical_writing_framework.md
+knowledge/architecture/index/002_technical_writing_framework.md
+
+$ rg -n '^# 0002\.' knowledge/architecture/index/002_technical_writing_framework.md
+1:# 0002. Use ASD-STE100 writing rules for knowledge management documents
+
+$ ! rg -n 'techincal|docs/hexagonal|ADR 0003|see ADR 0002|\[names|\[ADR index|\[to be filled' knowledge/ harness/ README.md
+no match
+
+$ rg -n -g '!.venv' -g '!proposals/0002-*' 'techincal|ard\.md' .
+no match (no remaining references repo-wide)
+
+$ uv run ruff format --check .   -> 63 files already formatted
+$ uv run ruff check .          -> All checks passed!
+$ uv run pytest -q             -> 47 passed in 0.31s
+$ python3 tools/cp/cp lint     -> 0 problem(s)
+$ python3 harness/checks/run_all.py -> all checks passed
+```
+
 ## DoD Sign-Off
 
 Status: PENDING

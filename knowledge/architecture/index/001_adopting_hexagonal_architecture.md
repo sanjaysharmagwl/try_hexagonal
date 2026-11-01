@@ -3,7 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-11-01
 - **Deciders:** Engineering team
-- **Related:** docs/hexagonal-architecture-team-guide.md, ADR 0002, ADR 0003
+- **Related:** `harness/standards/architecture.md`, `harness/checks/check_architecture.py`
 
 ## Context
 
@@ -44,14 +44,14 @@ Harder:
 - Developers must resist putting logic in routes or leaking ORM models into the domain.
 
 Follow-up:
-- Add an import-linter rule enforcing the dependency direction.
+- Enforce the dependency direction automatically. Done in CP-0001 via `harness/checks/check_architecture.py`.
 - Review the adoption after two months; record changes as new ADRs.
 
 ## Alternatives considered
 
 - **Layered architecture (routers, services, repositories):** simpler, but rules
   end up in services and entities become data holders. Rejected for long-lived
-  domain logic, but still suitable for simple CRUD parts (see ADR 0002).
+  domain logic, but still suitable for simple CRUD parts.
 - **Framework-driven structure (plain FastAPI conventions only):** fastest to start,
   but ties business rules to HTTP and the ORM. Rejected because testability and
   reuse were priorities.
