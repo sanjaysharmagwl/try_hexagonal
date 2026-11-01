@@ -1,89 +1,66 @@
 ---
 id: CP-0000
-title: Change Proposal Title
-author: Author Name
+title: <proposal title>
+author: <author name>
 status: Draft
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
-supersedes: []
-superseded_by: []
+created: <YYYY-MM-DD>
+updated: <YYYY-MM-DD>
+supersedes:
+superseded_by:
 tags: []
 ---
 
-# Summary
+# CP-0000: <proposal title>
 
-One or two sentences describing what this proposal is about.
+## Summary
 
-# Motivation / Problem
+<One or two sentences describing this proposal.>
 
-Describe the problem this proposal solves. Why is this change needed? What pain points does it address?
+## Motivation / Problem
 
-# Goals
+<The problem this proposal solves and why it is needed.>
 
-List specific, measurable goals for this proposal:
-- Goal 1
-- Goal 2
-- Goal 3
+## Goals
 
-# Non-Goals
+- <Goal 1>
 
-What is explicitly out of scope for this proposal:
-- Non-goal 1
-- Non-goal 2
+## Non-Goals
 
-# Proposed Solution
+- <Non-goal 1>
 
-High-level description of the proposed solution. Do not include implementation details. Focus on the "what" and "why", not the "how".
+## Proposed Solution
 
-If this involves architectural changes, describe them at a high level.
+<High-level description of the proposed solution — what and why, not how.>
 
-# Alternatives Considered
+## Alternatives Considered
 
-List alternative approaches that were considered and why they were rejected:
-- Alternative 1: Description and why rejected
-- Alternative 2: Description and why rejected
+- <Alternative 1>: <why rejected>
 
-# Impact
+## Impact
 
-## Users
-How will this affect end users?
-- User impact 1
-- User impact 2
+### Users
+<Impact on end users.>
 
-## Data
-Does this involve data migration, schema changes, or data retention?
-- Data impact 1
-- Data impact 2
+### Data
+<Data migration, schema, or retention impact.>
 
-## Security
-Does this introduce security considerations?
-- Security impact 1
-- Security impact 2
+### Security
+<Security considerations.>
 
-## Performance
-Does this affect performance?
-- Performance impact 1
-- Performance impact 2
+### Performance
+<Performance impact.>
 
-## Cost
-Does this involve additional costs?
-- Cost impact 1
-- Cost impact 2
+### Cost
+<Cost impact.>
 
-# Risks & Mitigations
+## Risks & Mitigations
 
-List potential risks and how they will be mitigated:
-- Risk 1: Mitigation strategy
-- Risk 2: Mitigation strategy
+- <Risk 1>: <mitigation>
 
-# Open Questions
+## Open Questions
 
-List questions that need to be resolved before implementation:
-- Question 1
-- Question 2
+- <Question 1>
 
-# Success Metrics
+## Success Metrics
 
-How will we know if this proposal is successful?
-- Metric 1: [specific, measurable]
-- Metric 2: [specific, measurable]
+- <Metric 1>
