@@ -43,7 +43,7 @@ Documentation-only edits, one task per document group, committed per task on bra
 
 ### T-002: Docs standard and ADR template
 
-- **Status**: todo
+- **Status**: done
 - **Requirements**: REQ-003
 - **Depends on**: none
 - **Files**: harness/standards/docs.md, knowledge/architecture/template/ard.md -> adr.md

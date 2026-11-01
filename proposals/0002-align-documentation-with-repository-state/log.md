@@ -51,6 +51,26 @@ $ python3 tools/cp/cp lint     -> 0 problem(s)
 $ python3 harness/checks/run_all.py -> all checks passed
 ```
 
+### T-002
+
+```
+$ ls knowledge/architecture/template/adr.md && ! ls knowledge/architecture/template/ard.md
+knowledge/architecture/template/adr.md
+ls: knowledge/architecture/template/ard.md: No such file or directory
+
+$ ! rg -n 'ard\.md|License' harness/standards/docs.md
+no match
+
+$ rg -n 'Deprecated' harness/standards/docs.md
+168:- Status (Proposed, Accepted, Deprecated, Superseded by NNNN)
+
+$ uv run ruff format --check .   -> 65 files already formatted
+$ uv run ruff check .          -> All checks passed!
+$ uv run pytest -q             -> 47 passed in 0.31s
+$ python3 tools/cp/cp lint     -> 0 problem(s)
+$ python3 harness/checks/run_all.py -> all checks passed
+```
+
 ## DoD Sign-Off
 
 Status: PENDING

@@ -149,10 +149,6 @@ Link to architecture docs.
 ## Contributing
 
 Link to CONTRIBUTING.md or instructions.
-
-## License
-
-License information.
 ```
 
 ### Quick Start
@@ -165,17 +161,19 @@ Quick start should:
 ## Architecture Decision Records (ADRs)
 
 ### Format
-Use the template in `knowledge/architecture/template/ard.md`.
+Use the template in `knowledge/architecture/template/adr.md`.
 
 ### Required Fields
 - Title
-- Status (Proposed, Accepted, Rejected, Superseded)
+- Status (Proposed, Accepted, Deprecated, Superseded by NNNN)
 - Context
 - Decision
 - Consequences
 
 ### Location
 `knowledge/architecture/index/NNN_description.md`
+
+Filenames use a three-digit number (`NNN_description.md`); the heading uses the same number with four digits (`# NNNN. Title`).
 
 ## Code Comments
 
