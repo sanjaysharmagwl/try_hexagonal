@@ -45,6 +45,8 @@ python3 tools/cp/cp next <id>
 
 (All commands can also be run as `uv run python tools/cp/cp ...`.)
 
+Full command list: `proposals/README.md` (Quick Reference).
+
 See `proposals/0001-adopt-change-proposal-process/` for a complete worked example.
 
 ## Checks

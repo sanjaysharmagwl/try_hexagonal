@@ -4,7 +4,7 @@ This document captures the technical stack and conventions for the Idea Manageme
 
 ## Language & Runtime
 
-- **Language**: Python 3.12+ (project requires >=3.12, local runtime is 3.13.5)
+- **Language**: Python 3.12+ (`requires-python = ">=3.12"`; CI uses 3.12)
 - **Package Manager**: uv (modern Python package installer)
 - **Virtual Environment**: .venv (managed by uv)
 
@@ -81,9 +81,9 @@ Key principles observed:
 
 ## Documentation
 
-- **README.md**: Project overview, setup instructions, API usage
-- **knowledge/**: Architecture documentation (mostly empty placeholders)
-- **No CONTRIBUTING.md**: Open Question - should be added
+- **README.md**: Project overview, quick start, API usage, checks, and contributing
+- **knowledge/**: Architecture decision records (ADRs)
+- **Contributing**: covered by the README Contributing section
 
 ## Build & Run Commands
 
@@ -138,10 +138,10 @@ python3 harness/checks/run_all.py
 
 1. **Linting/Formatting**: ruff (confirmed)
 2. **CI/CD**: GitHub Actions (confirmed)
-3. **Git**: Repository initialized, branching strategy to be defined in git.md
-4. **Coverage**: pytest-cov to be added
-5. **Test Organization**: Tests will be moved to tests/ directory
-6. **Pre-commit**: Minimum pre-commit hooks to be configured
+3. **Git**: Repository initialized; branching and merge strategy defined in `standards/git.md`
+4. **Coverage**: pytest-cov added; CI reports coverage
+5. **Test Organization**: Tests moved to `tests/`
+6. **Pre-commit**: Minimal local hooks configured in `.pre-commit-config.yaml`
 7. **Documentation Standards**: Google docstring format (most popular)
 
 ## Assumptions

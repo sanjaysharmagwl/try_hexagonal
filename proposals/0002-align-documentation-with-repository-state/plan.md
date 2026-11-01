@@ -76,7 +76,7 @@ Documentation-only edits, one task per document group, committed per task on bra
 
 ### T-005: Stack and harness README
 
-- **Status**: todo
+- **Status**: done
 - **Requirements**: REQ-006
 - **Depends on**: none
 - **Files**: harness/stack.md, harness/README.md

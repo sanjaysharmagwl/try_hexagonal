@@ -107,6 +107,22 @@ $ python3 tools/cp/cp lint     -> 0 problem(s)
 $ python3 harness/checks/run_all.py -> all checks passed
 ```
 
+### T-005
+
+```
+$ ! rg -n 'to be added|will be moved|to be configured|to be defined|3\.13\.5|No CONTRIBUTING' harness/stack.md
+no match
+
+$ rg -n 'proposals/README.md' harness/README.md
+48:Full command list: `proposals/README.md` (Quick Reference).
+
+$ uv run ruff format --check .   -> 65 files already formatted
+$ uv run ruff check .          -> All checks passed!
+$ uv run pytest -q             -> 47 passed in 0.30s
+$ python3 tools/cp/cp lint     -> 0 problem(s)
+$ python3 harness/checks/run_all.py -> all checks passed
+```
+
 ## DoD Sign-Off
 
 Status: PENDING
