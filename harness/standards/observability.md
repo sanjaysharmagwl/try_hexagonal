@@ -50,6 +50,7 @@ Use structured logging (JSON format) for production:
 import logging
 import json
 
+
 class JsonFormatter(logging.Formatter):
     def format(self, record):
         log_obj = {
@@ -92,6 +93,7 @@ Every log should include:
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 def submit_idea(command: SubmitIdeaCommand) -> Idea:
     logger.info("Submitting idea", extra={"user_id": command.author_id})

@@ -10,9 +10,19 @@ from datetime import date
 from pathlib import Path
 
 STATES = [
-    "Draft", "Proposed", "Accepted", "Specified", "Spec-Approved",
-    "Planned", "In-Progress", "Implemented", "Closed",
-    "Rejected", "Deferred", "Withdrawn", "Superseded",
+    "Draft",
+    "Proposed",
+    "Accepted",
+    "Specified",
+    "Spec-Approved",
+    "Planned",
+    "In-Progress",
+    "Implemented",
+    "Closed",
+    "Rejected",
+    "Deferred",
+    "Withdrawn",
+    "Superseded",
 ]
 
 TRANSITIONS = {
@@ -36,25 +46,63 @@ for s in TRANSITIONS:
 GATES = {"Accepted": "G1", "Spec-Approved": "G2", "In-Progress": "G3", "Closed": "G4"}
 NEEDS_BY = set(GATES) | {"Rejected", "Deferred", "Superseded"}
 
-PROPOSAL_KEYS = ["id", "title", "author", "status", "created", "updated",
-                 "supersedes", "superseded_by", "tags"]
+PROPOSAL_KEYS = [
+    "id",
+    "title",
+    "author",
+    "status",
+    "created",
+    "updated",
+    "supersedes",
+    "superseded_by",
+    "tags",
+]
 SPEC_KEYS = ["id", "proposal", "status", "version", "approved_by", "approved_on"]
 PLAN_KEYS = ["id", "spec", "status"]
 LOG_KEYS = ["id"]
 
-PROPOSAL_SECTIONS = ["Summary", "Motivation / Problem", "Goals", "Non-Goals",
-                     "Proposed Solution", "Alternatives Considered", "Impact",
-                     "Risks & Mitigations", "Open Questions", "Success Metrics"]
-SPEC_SECTIONS = ["Overview", "Definitions", "Requirements",
-                 "Interfaces & Data Contracts", "Error Handling & Edge Cases",
-                 "Non-Functional Requirements", "Security & Privacy",
-                 "Out of Scope", "Amendments"]
-PLAN_SECTIONS = ["Approach & Architecture Notes", "Files in Scope", "Task List",
-                 "Traceability Matrix", "Rollout / Migration / Rollback",
-                 "Verification Steps"]
+PROPOSAL_SECTIONS = [
+    "Summary",
+    "Motivation / Problem",
+    "Goals",
+    "Non-Goals",
+    "Proposed Solution",
+    "Alternatives Considered",
+    "Impact",
+    "Risks & Mitigations",
+    "Open Questions",
+    "Success Metrics",
+]
+SPEC_SECTIONS = [
+    "Overview",
+    "Definitions",
+    "Requirements",
+    "Interfaces & Data Contracts",
+    "Error Handling & Edge Cases",
+    "Non-Functional Requirements",
+    "Security & Privacy",
+    "Out of Scope",
+    "Amendments",
+]
+PLAN_SECTIONS = [
+    "Approach & Architecture Notes",
+    "Files in Scope",
+    "Task List",
+    "Traceability Matrix",
+    "Rollout / Migration / Rollback",
+    "Verification Steps",
+]
 
-TASK_FIELDS = ["Status", "Requirements", "Depends on", "Files", "Tests",
-               "Done when", "Size", "Description"]
+TASK_FIELDS = [
+    "Status",
+    "Requirements",
+    "Depends on",
+    "Files",
+    "Tests",
+    "Done when",
+    "Size",
+    "Description",
+]
 
 
 def err(msg):
@@ -122,7 +170,7 @@ def subsections(body: str, pattern: str):
     out = []
     for i, m in enumerate(matches):
         end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
-        out.append((m.group(1), m.group(2).strip(), body[m.start():end]))
+        out.append((m.group(1), m.group(2).strip(), body[m.start() : end]))
     return out
 
 
@@ -143,8 +191,7 @@ def cp_num(cp_dir: Path):
 
 def git_author(root: Path):
     try:
-        r = subprocess.run(["git", "config", "user.name"], cwd=root,
-                           capture_output=True, text=True)
+        r = subprocess.run(["git", "config", "user.name"], cwd=root, capture_output=True, text=True)
         return r.stdout.strip() or "unknown"
     except Exception:
         return "unknown"
@@ -184,6 +231,7 @@ def parse_matrix(plan_text: str):
 def lint_cp(cp_dir: Path, root: Path, structural_only=False):
     """Lint one CP dir. Returns list of 'path: message' problems."""
     problems = []
+
     def bad(name, msg):
         problems.append(f"{cp_dir.name}/{name}: {msg}")
 
@@ -238,7 +286,7 @@ def lint_cp(cp_dir: Path, root: Path, structural_only=False):
     req_ids = []
     if "spec.md" in texts:
         seen = set()
-        for rid, title, block in parse_reqs(texts["spec.md"]):
+        for rid, _title, block in parse_reqs(texts["spec.md"]):
             if rid in seen:
                 bad("spec.md", f"duplicate {rid}")
             seen.add(rid)
@@ -293,8 +341,10 @@ def lint_cp(cp_dir: Path, root: Path, structural_only=False):
     # --- status consistency ---
     status = pf.get("status", "")
     order = STATES.index(status) if status in STATES else -1
+
     def at_or_after(s):
         return status in STATES and order >= STATES.index(s)
+
     if at_or_after("Specified") and "spec.md" not in texts:
         bad("spec.md", f"status {status} requires spec.md")
     if at_or_after("Planned") and "plan.md" not in texts:
@@ -365,15 +415,18 @@ def regenerate_index(root: Path):
         for d in sorted(pdir.iterdir()):
             if d.is_dir() and re.match(r"^\d{4}-", d.name) and d.name != "0000-template":
                 fm = parse_fm(d / "proposal.md") or {}
-                rows.append(f"| {fm.get('id','?')} | {fm.get('title','?')} "
-                            f"| {fm.get('status','?')} | {fm.get('author','?')} |")
-    table = "\n".join(["| ID | Title | Status | Author |",
-                       "|----|-------|--------|--------|"] + rows)
+                rows.append(
+                    f"| {fm.get('id', '?')} | {fm.get('title', '?')} "
+                    f"| {fm.get('status', '?')} | {fm.get('author', '?')} |"
+                )
+    table = "\n".join(
+        ["| ID | Title | Status | Author |", "|----|-------|--------|--------|"] + rows
+    )
     text = readme.read_text() if readme.exists() else ""
     start, end = "<!-- cp-index:start -->", "<!-- cp-index:end -->"
     if start in text and end in text:
-        pre = text[:text.index(start) + len(start)]
-        post = text[text.index(end):]
+        pre = text[: text.index(start) + len(start)]
+        post = text[text.index(end) :]
         new = pre + "\n" + table + "\n" + post
     else:
         new = text.rstrip() + f"\n\n{start}\n{table}\n{end}\n"
@@ -385,7 +438,7 @@ def append_history(log_path: Path, line: str):
     if "## Status History" not in text:
         text = text.rstrip() + "\n\n## Status History\n"
     lines = text.splitlines()
-    idx = next(i for i, l in enumerate(lines) if l.strip() == "## Status History")
+    idx = next(i for i, ln in enumerate(lines) if ln.strip() == "## Status History")
     # drop placeholder bullets like '- <YYYY-MM-DD> ...'
     j = idx + 1
     while j < len(lines) and (lines[j].strip() == "" or lines[j].startswith("- <")):
@@ -409,8 +462,11 @@ def cmd_new(root, title, author):
     if not tmpl.is_dir():
         err("proposals/0000-template not found")
         return 1
-    nums = [int(d.name[:4]) for d in pdir.iterdir()
-            if d.is_dir() and re.match(r"^\d{4}-", d.name) and d.name != "0000-template"]
+    nums = [
+        int(d.name[:4])
+        for d in pdir.iterdir()
+        if d.is_dir() and re.match(r"^\d{4}-", d.name) and d.name != "0000-template"
+    ]
     n = (max(nums) + 1) if nums else 1
     slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
     cp_dir = pdir / f"{n:04d}-{slug}"
@@ -424,9 +480,17 @@ def cmd_new(root, title, author):
 
     prop = (tmpl / "proposal.md").read_text()
     cp_dir.joinpath("proposal.md").write_text(prop)
-    set_fm(cp_dir / "proposal.md", {
-        "id": cp_id, "title": title, "author": author,
-        "status": "Draft", "created": today, "updated": today})
+    set_fm(
+        cp_dir / "proposal.md",
+        {
+            "id": cp_id,
+            "title": title,
+            "author": author,
+            "status": "Draft",
+            "created": today,
+            "updated": today,
+        },
+    )
     text = (cp_dir / "proposal.md").read_text()
     text = text.replace("# CP-0000:", f"# {cp_id}:", 1)
     (cp_dir / "proposal.md").write_text(text)
@@ -460,8 +524,10 @@ def cmd_status(root, cp_id, state=None, by=None, superseded_by=None):
         err(f"invalid transition {cur} -> {state}")
         return 1
     if state in NEEDS_BY and not by:
-        err(f"transition {cur} -> {state} requires --by <name> "
-            f"(gate {GATES.get(state, '')} / terminal state)")
+        err(
+            f"transition {cur} -> {state} requires --by <name> "
+            f"(gate {GATES.get(state, '')} / terminal state)"
+        )
         return 1
     # preconditions
     if state == "Specified" and not (cp_dir / "spec.md").exists():
@@ -554,8 +620,7 @@ def cmd_lint(root, cp_id=None):
         if not cp_dir:
             err(f"CP {cp_id} not found")
             return 1
-        problems = lint_cp(cp_dir, root,
-                           structural_only=(cp_dir.name == "0000-template"))
+        problems = lint_cp(cp_dir, root, structural_only=(cp_dir.name == "0000-template"))
     else:
         problems = lint_all(root)
     for p in problems:
@@ -613,18 +678,22 @@ def main(argv=None, root=None):
 
     if cmd == "new":
         if not rest:
-            err("usage: cp new \"<title>\" [--author NAME]")
+            err('usage: cp new "<title>" [--author NAME]')
             return 1
         return cmd_new(root, rest[0], opt("--author"))
     if cmd == "status":
-        pos = [a for a in rest if not a.startswith("--")
-               and (rest.index(a) == 0 or rest[rest.index(a) - 1] not in
-                    ("--by", "--superseded-by"))]
+        pos = [
+            a
+            for a in rest
+            if not a.startswith("--")
+            and (rest.index(a) == 0 or rest[rest.index(a) - 1] not in ("--by", "--superseded-by"))
+        ]
         if not pos:
             err("usage: cp status <id> [<state>] [--by NAME]")
             return 1
-        return cmd_status(root, pos[0], pos[1] if len(pos) > 1 else None,
-                          opt("--by"), opt("--superseded-by"))
+        return cmd_status(
+            root, pos[0], pos[1] if len(pos) > 1 else None, opt("--by"), opt("--superseded-by")
+        )
     if cmd in ("spec", "plan"):
         if not rest:
             err(f"usage: cp {cmd} <id>")

@@ -13,7 +13,6 @@ import re
 import sys
 from pathlib import Path
 
-
 SECRET_PATTERNS = [
     (r"api[_-]?key\s*=\s*['\"][^'\"]{10,}['\"]", "API key"),
     (r"password\s*=\s*['\"][^'\"]{8,}['\"]", "Password"),
@@ -25,14 +24,14 @@ SECRET_PATTERNS = [
 
 def check_file(file_path: Path) -> bool:
     """Check a single file for secrets."""
-    with open(file_path, "r") as f:
+    with open(file_path) as f:
         content = f.read()
 
     all_passed = True
     for pattern, description in SECRET_PATTERNS:
         matches = re.finditer(pattern, content, re.IGNORECASE)
         for match in matches:
-            line_num = content[:match.start()].count("\n") + 1
+            line_num = content[: match.start()].count("\n") + 1
             print(f"ERROR: {file_path}:{line_num} possible {description}")
             all_passed = False
 

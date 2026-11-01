@@ -49,6 +49,7 @@ class SubmitIdea:
     def __init__(self, ideas: IdeaRepository) -> None:
         self._ideas = ideas
 
+
 # Bad: Depends on implementation
 class SubmitIdea:
     def __init__(self, ideas: InMemoryIdeaRepository) -> None:

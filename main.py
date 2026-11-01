@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-from app.ideas.service import SubmitIdea
-from app.ideas.router import router
 from app.ideas.repository import InMemoryIdeaRepository
+from app.ideas.router import router
+from app.ideas.service import SubmitIdea
 
 
 def create_app() -> FastAPI:

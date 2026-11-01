@@ -12,14 +12,13 @@ Enforces dependency rules from harness/standards/architecture.md:
 import ast
 import sys
 from pathlib import Path
-from typing import Dict, Set
 
 
-def get_imports(file_path: Path) -> Set[str]:
+def get_imports(file_path: Path) -> set[str]:
     """Extract all imports from a Python file."""
     imports = set()
     try:
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             tree = ast.parse(f.read(), filename=str(file_path))
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
@@ -53,7 +52,11 @@ def check_file(file_path: Path) -> bool:
 
     # Domain layer: no external dependencies except stdlib
     if layer == "domain":
-        external = [imp for imp in imports if not imp.startswith("app") and imp not in sys.stdlib_module_names]
+        external = [
+            imp
+            for imp in imports
+            if not imp.startswith("app") and imp not in sys.stdlib_module_names
+        ]
         if external:
             print(f"ERROR: {file_path} (domain) has external dependencies: {external}")
             return False

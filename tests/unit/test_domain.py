@@ -1,4 +1,5 @@
 import pytest
+
 from app.ideas.models import Idea, IdeaStatus, InvalidStatusTransitionError
 
 

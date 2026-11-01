@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.ideas.service import SubmitIdea, SubmitIdeaCommand
+from app.core.deps import get_submit_idea
 from app.ideas.models import DomainError
 from app.ideas.schemas import IdeaResponse, SubmitIdeaRequest
-from app.core.deps import get_submit_idea
+from app.ideas.service import SubmitIdea, SubmitIdeaCommand
 
 router = APIRouter(prefix="/ideas", tags=["ideas"])
 

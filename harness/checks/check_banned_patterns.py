@@ -9,11 +9,9 @@ Enforces coding standards from harness/standards/coding.md:
 - No commented-out code
 """
 
-import ast
 import re
 import sys
 from pathlib import Path
-
 
 BANNED_PATTERNS = [
     (r"from .* import \*", "Wildcard import"),
@@ -24,7 +22,7 @@ BANNED_PATTERNS = [
 
 def check_file(file_path: Path) -> bool:
     """Check a single file for banned patterns."""
-    with open(file_path, "r") as f:
+    with open(file_path) as f:
         content = f.read()
 
     all_passed = True
@@ -37,7 +35,9 @@ def check_file(file_path: Path) -> bool:
     lines = content.split("\n")
     for i, line in enumerate(lines, 1):
         stripped = line.strip()
-        if stripped.startswith("#") and any(c in stripped for c in ["=", "def ", "class ", "import "]):
+        if stripped.startswith("#") and any(
+            c in stripped for c in ["=", "def ", "class ", "import "]
+        ):
             # Skip if it's a comment explaining code
             if not any(word in stripped.lower() for word in ["todo", "fixme", "hack", "note"]):
                 print(f"WARNING: {file_path}:{i} possible commented-out code: {stripped[:50]}")
