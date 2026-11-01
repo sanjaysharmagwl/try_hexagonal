@@ -35,6 +35,7 @@ This document defines the testing approach and expectations for this repository.
 ## Test Organization
 
 ### File Structure
+Target layout (today only `tests/unit/test_domain.py` exists):
 ```
 tests/
 ├── unit/
@@ -91,7 +92,7 @@ def test_idea_status_transition():
 - **Adapters**: 70%
 
 ### Rules
-- CI reports coverage on every run (`pytest --cov=app --cov-report=term-missing`)
+- CI reports coverage on every run (`pytest --cov=app --cov=tools/cp --cov-report=term-missing`)
 - Coverage must not decrease relative to `main`
 - The 80% overall target is provisional <!-- inferred: confirm -->
 
@@ -102,7 +103,7 @@ def test_idea_status_transition():
 
 ### Measuring Coverage
 ```bash
-pytest --cov=app --cov-report=html
+uv run pytest --cov=app --cov=tools/cp --cov-report=html
 ```
 
 ## Test Data
@@ -139,12 +140,12 @@ pytest tests/unit/
 
 ### With Coverage
 ```bash
-pytest --cov=app
+uv run pytest --cov=app --cov=tools/cp
 ```
 
 ### Specific Test
 ```bash
-pytest tests/unit/test_domain.py::test_idea_status
+pytest tests/unit/test_domain.py::test_review_then_approve
 ```
 
 ## Async Tests

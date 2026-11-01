@@ -71,6 +71,25 @@ $ python3 tools/cp/cp lint     -> 0 problem(s)
 $ python3 harness/checks/run_all.py -> all checks passed
 ```
 
+### T-003
+
+```
+$ ! rg -n '^app/$' harness/standards/architecture.md && rg -n '^├── app/' harness/standards/architecture.md
+76:├── app/
+
+$ rg -n 'cov=tools/cp' harness/standards/testing.md
+95, 106, 143 matched
+
+$ uv run pytest --collect-only -q tests/unit/test_domain.py::test_review_then_approve
+1 test collected in 0.06s
+
+$ uv run ruff format --check .   -> 65 files already formatted
+$ uv run ruff check .          -> All checks passed!
+$ uv run pytest -q             -> 47 passed in 0.28s
+$ python3 tools/cp/cp lint     -> 0 problem(s)
+$ python3 harness/checks/run_all.py -> all checks passed
+```
+
 ## DoD Sign-Off
 
 Status: PENDING

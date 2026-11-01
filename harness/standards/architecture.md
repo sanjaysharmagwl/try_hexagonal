@@ -72,15 +72,16 @@ Domain layer does NOT contain:
 ## Module Structure
 
 ```
-app/
-├── core/              # Shared application utilities
-├── <feature>/         # Feature-specific modules
-│   ├── models.py      # Domain entities
-│   ├── service.py     # Use cases
-│   ├── repository.py  # Repository interface + implementations
-│   ├── router.py      # HTTP adapter (if applicable)
-│   └── schemas.py     # DTOs for HTTP
-└── main.py            # Composition root
+try_hexagonal/
+├── app/
+│   ├── core/              # Shared application utilities
+│   └── <feature>/         # Feature-specific modules
+│       ├── models.py      # Domain entities
+│       ├── service.py     # Use cases
+│       ├── repository.py  # Repository interface + implementations
+│       ├── router.py      # HTTP adapter (if applicable)
+│       └── schemas.py     # DTOs for HTTP
+└── main.py                # Composition root
 ```
 
 ## Composition Root

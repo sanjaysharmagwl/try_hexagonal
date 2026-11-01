@@ -54,7 +54,7 @@ Documentation-only edits, one task per document group, committed per task on bra
 
 ### T-003: Architecture and testing standards
 
-- **Status**: todo
+- **Status**: done
 - **Requirements**: REQ-004
 - **Depends on**: none
 - **Files**: harness/standards/architecture.md, harness/standards/testing.md
