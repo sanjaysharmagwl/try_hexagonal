@@ -39,7 +39,9 @@ def check(root: Path) -> list[str]:
             text = f.read_text()
         except (UnicodeDecodeError, ValueError):
             continue  # binary
-        if "check_secrets" in f.name or ("tests" in f.parts and "fixtures" in f.parts):
+        rel = f.relative_to(root).as_posix()
+        # skip this check and its own test files (they contain fixture secrets)
+        if "check_secrets" in f.name or rel.startswith("harness/checks/tests/"):
             continue
         for i, line in enumerate(text.splitlines(), 1):
             for pat, desc in PATTERNS:
