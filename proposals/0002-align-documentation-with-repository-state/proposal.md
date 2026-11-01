@@ -2,7 +2,7 @@
 id: CP-0002
 title: Align documentation with repository state
 author: sanjaysharmagwl
-status: In-Progress
+status: Implemented
 created: 2026-11-02
 updated: 2026-11-02
 supersedes:
