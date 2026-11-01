@@ -98,7 +98,7 @@ Documentation-only edits, one task per document group, committed per task on bra
 
 ### T-007: Final verification
 
-- **Status**: todo
+- **Status**: done
 - **Requirements**: REQ-008
 - **Depends on**: T-001, T-002, T-003, T-004, T-005, T-006
 - **Files**: proposals/0002-align-documentation-with-repository-state/log.md

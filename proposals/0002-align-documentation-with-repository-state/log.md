@@ -153,6 +153,32 @@ $ python3 tools/cp/cp lint     -> 0 problem(s)
 $ python3 harness/checks/run_all.py -> all checks passed
 ```
 
+### T-007
+
+```
+$ git diff --name-only main...HEAD | rg '^(app/|tests/|tools/|harness/checks/|\.github/|main\.py|pyproject\.toml|uv\.lock)'
+(no out-of-scope paths)
+
+$ uv run ruff format --check .
+63 files already formatted
+
+$ uv run ruff check .
+All checks passed!
+
+$ uv run pytest -q
+47 passed in 0.31s
+
+$ python3 tools/cp/cp lint
+0 problem(s)
+
+$ python3 harness/checks/run_all.py
+[PASS] check_architecture.py
+[PASS] check_banned_patterns.py
+[PASS] check_secrets.py
+[PASS] check_templates_sync.py
+all checks passed
+```
+
 ## DoD Sign-Off
 
 Status: PENDING
