@@ -1,26 +1,18 @@
-## CP Reference
+## OpenSpec Change
 
-CP-____
-
-## Tasks Covered
-
-- T-___
-
-## Requirements Covered
-
-- REQ-___
+Change name: `<change-name>` (from `openspec/changes/<change-name>/`)
 
 ## Trivial?
 
-- [ ] This is a trivial change (add the `trivial` label — no CP required)
+- [ ] This is a trivial change (no OpenSpec change required — see `harness/constitution.md`)
 
 ## Definition of Done
 
-- [ ] Every REQ in spec.md has a corresponding test
+- [ ] Every requirement/scenario in the change's spec deltas has a corresponding test
+- [ ] All `tasks.md` items are checked off
 - [ ] All tests pass (`uv run pytest`)
 - [ ] `ruff format --check .` and `ruff check .` pass
 - [ ] Coverage does not decrease
-- [ ] `python3 tools/cp/cp lint` passes
+- [ ] `openspec validate --all --strict --no-interactive` passes
 - [ ] `python3 harness/checks/run_all.py` passes
-- [ ] log.md updated (decisions, deviations, verification results)
-- [ ] Files changed match the plan's "Files in Scope" (deviations logged)
+- [ ] Documentation updated where needed

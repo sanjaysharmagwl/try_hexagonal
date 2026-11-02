@@ -39,16 +39,16 @@ This document defines documentation requirements for this repository.
 
 **Location**: `knowledge/architecture/`
 
-### 4. CP Documentation
+### 4. OpenSpec Documentation
 **Purpose**: Track changes and decisions
 
 **Must include**:
 - proposal.md: Why and what (high level)
-- spec.md: What (detailed, behavioral)
-- plan.md: How (implementation)
-- log.md: Implementation notes and decisions
+- design.md: How and key decisions (when needed)
+- tasks.md: Implementation checklist
+- spec deltas: Behavioral changes to capability specs
 
-**Location**: `proposals/XXXX-slug/`
+**Location**: changes under `openspec/changes/<name>/`; merged capability specs under `openspec/specs/`
 
 ## Docstring Format
 

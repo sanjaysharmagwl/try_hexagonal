@@ -149,7 +149,7 @@ pytest tests/unit/test_domain.py::test_idea_status
 
 ## Async Tests
 
-pytest-asyncio is **not installed**. If async tests are needed, add it via a CP and document usage here.
+pytest-asyncio is **not installed**. If async tests are needed, add it via an OpenSpec change and document usage here.
 
 ## Mocking
 
@@ -164,7 +164,7 @@ pytest-asyncio is **not installed**. If async tests are needed, add it via a CP 
 - Pure functions
 
 ### Mocking Style
-pytest-mock is **not installed**. Use `unittest.mock` from the standard library; add pytest-mock via a CP if needed.
+pytest-mock is **not installed**. Use `unittest.mock` from the standard library; add pytest-mock via an OpenSpec change if needed.
 
 ## Flaky Tests
 

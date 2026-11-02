@@ -37,9 +37,10 @@ try_hexagonal/
 │       └── schemas.py      # API request/response DTOs
 ├── tests/                  # Test directory
 │   └── unit/               # Unit tests (domain tests live here)
-├── tools/cp/               # CP workflow CLI
-├── harness/                # Standards, workflow, templates, checks
-├── proposals/              # Change Proposals
+├── openspec/               # OpenSpec specs and changes
+│   ├── specs/              # Baseline capability specs
+│   └── changes/            # Active and archived changes
+├── harness/                # Standards, workflow, checks
 └── knowledge/              # Architecture documentation
 ```
 
@@ -60,23 +61,22 @@ Key principles observed:
 ## Testing
 
 - **Test Runner**: pytest
-- **Test Location**: `tests/unit/` for domain/unit tests; `tools/cp/tests/` and `harness/checks/tests/` for tooling tests
+- **Test Location**: `tests/unit/` for domain/unit tests; `harness/checks/tests/` for tooling tests
 - **Test Style**: pytest with plain assertions
-- **Coverage**: pytest-cov, reported in CI (`--cov=app --cov=tools/cp`); must not decrease
+- **Coverage**: pytest-cov, reported in CI (`--cov=app`); must not decrease
 - **Current Tests**: Domain entity behavior tests (status transitions)
 
 ## Code Quality Tools
 
 - **ruff**: Linter and formatter (selected rules: E, F, I, B, UP; B008 ignored for FastAPI `Depends`; line-length 100; target py312)
-- **pytest-cov**: Coverage reporting (`--cov=app --cov=tools/cp`)
-- **pre-commit**: Minimal local hooks (ruff format, ruff check, `cp lint` on proposals); install via `uvx pre-commit install`
-- Type checking (mypy) is not adopted — candidate for a future CP
+- **pytest-cov**: Coverage reporting (`--cov=app`)
+- **pre-commit**: Minimal local hooks (ruff format, ruff check, `openspec validate` on `openspec/` changes); install via `uvx pre-commit install`
+- Type checking (mypy) is not adopted — candidate for a future change
 
 ## CI/CD
 
 - **GitHub Actions** (`.github/workflows/ci.yml`):
-  - `checks` job: ruff format check, ruff lint, pytest with coverage, `cp lint`, `harness/checks/run_all.py`
-  - `cp-reference` job (PRs only): verifies a non-trivial PR references an In-Progress CP
+  - `checks` job: ruff format check, ruff lint, pytest with coverage, `openspec validate --all --strict`, `harness/checks/run_all.py`
 - Coverage must not decrease; 80% overall target <!-- inferred: confirm -->
 
 ## Documentation
@@ -98,14 +98,14 @@ uv run uvicorn main:app --reload
 uv run pytest
 
 # Run tests with coverage
-uv run pytest --cov=app --cov=tools/cp
+uv run pytest --cov=app
 
 # Lint and format
 uv run ruff check .
 uv run ruff format --check .
 
-# CP tooling
-python3 tools/cp/cp lint
+# OpenSpec and harness checks
+openspec validate --all --strict --no-interactive
 python3 harness/checks/run_all.py
 ```
 
@@ -113,7 +113,7 @@ python3 harness/checks/run_all.py
 
 - Repository initialized; `main` is the default branch
 - `uv.lock` is committed (reproducible installs and audits)
-- Branch naming: `cp-XXXX-short-description`; commit format: `<type>: <subject> (CP-XXXX, T-YYY, REQ-ZZZ)`
+- Branch naming: `<change-name>` (kebab-case, matching `openspec/changes/<change-name>`); commit format: `<type>: <subject> (<change-name>)`
 - See `harness/standards/git.md` for the full conventions
 
 ## Conventions Inferred
@@ -146,14 +146,10 @@ python3 harness/checks/run_all.py
 
 ## Assumptions
 
-- CP-0001 bootstrap gate approvals are pending human confirmation
 - ruff rule set chosen (E, F, I, B, UP); B008 ignored for FastAPI `Depends`
-- `cp status --by` is an honor-system human-gate record, not authentication
-- Type checking (mypy) is not adopted — candidate for a future CP
-- Open questions will be answered by humans during the CP-0001 approval process
+- Type checking (mypy) is not adopted — candidate for a future change
 
 ## Remaining Open Questions
 
 - Coverage threshold (80% is provisional) <!-- inferred: confirm -->
 - Branch protection for `main` must be configured in the GitHub UI (cannot be done from the repo)
-- The `cp-reference` CI rule relies on the PR body/title/labels — it is advisory for edge cases it cannot see

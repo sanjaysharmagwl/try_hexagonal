@@ -12,9 +12,9 @@ repos:
         entry: uv run ruff check
         language: system
         types: [python]
-      - id: cp-lint
-        name: cp lint
-        entry: uv run python tools/cp/cp lint
+      - id: openspec-validate
+        name: openspec validate
+        entry: npx -y @fission-ai/openspec@1.15.0 validate --all --strict --no-interactive
         language: system
-        files: ^proposals/
+        files: ^openspec/
         pass_filenames: false

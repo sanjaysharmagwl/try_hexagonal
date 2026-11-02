@@ -10,21 +10,21 @@ This document defines git workflow and conventions for this repository.
 - Direct commits to `main` are forbidden
 
 ### Feature Branches
-- Create a branch for each CP: `cp-0001-description`
+- Create a branch for each OpenSpec change
 - Branch from `main`
 - Merge back via PR
 - Delete branch after merge
 
 ### Branch Naming
-- Format: `cp-XXXX-short-description`
-- Example: `cp-0001-add-user-authentication`
+- Format: `<change-name>` — kebab-case matching `openspec/changes/<change-name>`
+- Example: `add-user-authentication`
 - Use lowercase, hyphens only
 
 ## Commit Messages
 
 ### Format
 ```
-<type>: <subject> (CP-XXXX, T-YYY, REQ-ZZZ)
+<type>: <subject> (<change-name>)
 
 <body>
 
@@ -44,7 +44,7 @@ This document defines git workflow and conventions for this repository.
 - Imperative mood ("add" not "added")
 - 50 characters or less
 - No period at end
-- Reference CP ID, Task ID, and REQ IDs
+- Reference the OpenSpec change name
 
 ### Body
 - Explain "why", not "what"
@@ -57,9 +57,9 @@ This document defines git workflow and conventions for this repository.
 
 ### Example
 ```
-feat: add idea approval workflow (CP-0001, T-003, REQ-002)
+feat: add idea approval workflow (add-idea-approval)
 
-Implement the approval workflow as specified in REQ-002.
+Implement the approval workflow from the change's spec deltas.
 Adds status transitions and validation.
 
 BREAKING CHANGE: Idea.status now includes "approved" state.
@@ -73,42 +73,17 @@ Co-Authored-By: Devin <158243242+devin-ai-integration[bot]@users.noreply.github.
 
 ### PR Title
 - Follow commit message format
-- Include CP ID
-- Example: `feat: add idea approval workflow (CP-0001)`
+- Include the change name
+- Example: `feat: add idea approval workflow (add-idea-approval)`
 
-### PR Description Template
-```markdown
-## CP Reference
-CP-XXXX: [title]
-
-## Tasks Covered
-- T-001: ...
-- T-002: ...
-
-## Requirements Covered
-- REQ-001: ...
-- REQ-002: ...
-
-## Checklist
-- [ ] All tests pass
-- [ ] ruff format applied
-- [ ] ruff check passes
-- [ ] Coverage maintained
-- [ ] Documentation updated
-- [ ] log.md updated
-```
+### PR Description
+Use `.github/pull_request_template.md` — it records the OpenSpec change name (or a trivial-change tick) and the Definition of Done checklist.
 
 ### PR Requirements
-- Must reference a CP in `In-Progress` state
+- Non-trivial changes must reference an OpenSpec change under `openspec/changes/`
 - Must pass all CI checks
 - Must have at least one reviewer approval
 - Must resolve all review comments
-
-### PR Labels
-- `trivial`: For trivial changes (bypasses CP requirement)
-- `bugfix`: For bug fixes
-- `feature`: For new features
-- `breaking`: For breaking changes
 
 ## Code Review
 
@@ -153,14 +128,13 @@ CP-XXXX: [title]
 ### Blocking
 PRs will be blocked if:
 - CI checks fail
-- No CP reference (unless `trivial` label)
 - No reviewer approval
 - Merge conflicts not resolved
 
 ## Git Hooks
 
 ### Pre-commit
-A minimal `.pre-commit-config.yaml` (local hooks only) runs ruff format, ruff check, and `cp lint` on proposal changes. Install it with:
+A minimal `.pre-commit-config.yaml` (local hooks only) runs ruff format, ruff check, and `openspec validate` on `openspec/` changes. Install it with:
 ```bash
 uvx pre-commit install
 ```

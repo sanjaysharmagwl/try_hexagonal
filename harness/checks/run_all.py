@@ -1,4 +1,4 @@
-"""Run every local harness check (excludes CI-only check_pr_reference.py)."""
+"""Run every local harness check."""
 
 import importlib.util
 import sys
@@ -18,8 +18,6 @@ def load(path: Path):
 def main() -> int:
     failed = 0
     for path in sorted(CHECKS_DIR.glob("check_*.py")):
-        if path.name == "check_pr_reference.py":
-            continue
         violations = load(path).check(ROOT)
         status = "PASS" if not violations else "FAIL"
         print(f"[{status}] {path.name}")

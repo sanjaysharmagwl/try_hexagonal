@@ -29,5 +29,5 @@ ignore = ["B008"]  # FastAPI Depends() in defaults is idiomatic
 "app/ideas/router.py" = ["B904"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "tools/cp/tests", "harness/checks/tests"]
+testpaths = ["tests", "harness/checks/tests"]
 pythonpath = ["."]

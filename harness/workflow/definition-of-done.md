@@ -1,26 +1,28 @@
 # Definition of Done
 
-This document defines the checklist that must be satisfied before a CP can be closed.
+This document defines the checklist that must be satisfied before an OpenSpec change can be considered complete.
 
 ## DoD Checklist
 
-A CP is considered "done" only when ALL of the following are satisfied:
+A change is considered "done" only when ALL of the following are satisfied:
+
+### Tasks
+- [ ] Every item in the change's `tasks.md` is checked off
 
 ### Requirements Coverage
-- [ ] Every REQ in spec.md has at least one corresponding test
-- [ ] Every test can be traced back to a REQ ID
-- [ ] Traceability matrix in plan.md is complete
+- [ ] Every requirement/scenario in the change's spec deltas has at least one corresponding test
+- [ ] Tests reference the requirement names they cover
+- [ ] Edge cases are tested
 
 ### Code Quality
-- [ ] All code passes ruff linting
-- [ ] All code passes ruff formatting
+- [ ] All code passes ruff linting (`uv run ruff check .`)
+- [ ] All code passes ruff formatting (`uv run ruff format --check .`)
 - [ ] No new warnings introduced
 
 ### Testing
-- [ ] All tests pass (`pytest`)
-- [ ] Coverage does not decrease relative to `main` (80% overall target <!-- inferred: confirm -->)
+- [ ] All tests pass (`uv run pytest`)
+- [ ] Coverage does not decrease relative to `main` (80% overall target)
 - [ ] New code has corresponding tests
-- [ ] Edge cases are tested
 
 ### Documentation
 - [ ] README.md is updated if user-facing changes
@@ -29,34 +31,27 @@ A CP is considered "done" only when ALL of the following are satisfied:
 - [ ] Architecture documentation updated if structural changes
 - [ ] Migration guide included if breaking changes
 
-### Harness Checks
-- [ ] All checks in `harness/checks/` pass
-- [ ] `cp lint <id>` passes without errors
+### Checks
+- [ ] All checks in `harness/checks/` pass (`python3 harness/checks/run_all.py`)
+- [ ] `openspec validate --all --strict` passes
 - [ ] No new security vulnerabilities introduced
 
 ### Process Artifacts
-- [ ] log.md is complete with:
-  - All implementation decisions
-  - Any deviations from spec (with amendments)
-  - Verification results from each task
-  - Rollback notes if applicable
-- [ ] No TODOs without linked CP
-- [ ] All open questions from proposal are resolved
-
-### Verification
-- [ ] Verification steps in plan.md all pass
-- [ ] Manual testing (if required) is documented
-- [ ] Reviewer has signed off
+- [ ] No TODOs left without a linked change
+- [ ] All open questions in the change's artifacts are resolved
 
 ### Review
-- [ ] At least one human reviewer has approved
+- [ ] At least one human reviewer has approved the PR
 - [ ] Reviewer confirms DoD is met
 - [ ] All reviewer feedback addressed
+
+### Archival
+- [ ] When the change merges, it is archived so its delta specs are merged into `openspec/specs/` (`openspec archive <change>`)
 
 ## DoD Exceptions
 
 Exceptions to DoD must be:
-1. Documented in the CP's plan.md
+1. Documented in the change's artifacts
 2. Approved by the reviewer
 3. Exceptionally rare
 
@@ -64,16 +59,3 @@ Common exceptions:
 - Legacy code that cannot reach the coverage target
 - Documentation for internal-only features
 - Experimental features marked as such
-
-## Sign-Off
-
-When DoD is met, the reviewer adds to log.md:
-```markdown
-## DoD Sign-Off
-**Date**: YYYY-MM-DD
-**Reviewer**: [name]
-**Status**: PASSED
-**Notes**: [any notes]
-```
-
-The CP can then transition to Closed.

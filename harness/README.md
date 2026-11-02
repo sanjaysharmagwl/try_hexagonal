@@ -1,15 +1,13 @@
 # Harness
 
-This directory contains the standards, workflows, and templates that govern the Change Proposal (CP) process for this repository.
+This directory contains the standards and workflows that govern development for this repository, alongside the OpenSpec spec-driven workflow in `openspec/`.
 
 ## Overview
 
 The harness defines:
 - **Constitution**: Non-negotiable principles
 - **Standards**: Coding, architecture, testing, security, git, docs, observability
-- **Workflow**: CP lifecycle, roles, agent protocol, definition of done
-- **Templates**: Proposal, spec, and plan templates
-- **Prompts**: Reusable agent prompts for each phase
+- **Workflow**: Agent protocol, definition of done
 - **Checks**: Executable enforcement of standards
 
 ## Usage
@@ -17,7 +15,7 @@ The harness defines:
 For humans:
 1. Read `constitution.md` to understand the principles
 2. Review relevant `standards/` files before making changes
-3. Follow the workflow in `workflow/lifecycle.md` for all non-trivial changes
+3. Non-trivial changes go through an OpenSpec change under `openspec/changes/`
 
 For agents:
 1. Always read `AGENTS.md` (root) first
@@ -28,24 +26,24 @@ For agents:
 
 ## Quick Start
 
-To create a new Change Proposal:
+To propose a new change, use the `openspec-propose` skill (`.agents/skills/`) — it writes `proposal.md`, `design.md`, spec deltas, and `tasks.md` under `openspec/changes/<name>/`.
+
+To inspect OpenSpec state:
+
 ```bash
-python3 tools/cp/cp new "Your proposal title"
+openspec list                 # active changes
+openspec list --specs         # specs
+openspec show <change>        # a change's artifacts
+openspec validate --all --strict --no-interactive
 ```
 
-To lint a proposal:
+To archive a completed change (merges its delta specs into `openspec/specs/`):
+
 ```bash
-python3 tools/cp/cp lint <id>
+openspec archive <change>
 ```
 
-To see the next task in a plan:
-```bash
-python3 tools/cp/cp next <id>
-```
-
-(All commands can also be run as `uv run python tools/cp/cp ...`.)
-
-See `proposals/0001-adopt-change-proposal-process/` for a complete worked example.
+Install the CLI with `npm i -g @fission-ai/openspec@1.15.0`.
 
 ## Checks
 
@@ -54,8 +52,6 @@ Executable standards enforcement lives in `harness/checks/`:
 - `check_architecture.py` — layering/boundary rules
 - `check_banned_patterns.py` — wildcard imports, bare except, print/breakpoint
 - `check_secrets.py` — committed-secret scan
-- `check_templates_sync.py` — templates in sync with `proposals/0000-template/`
-- `check_pr_reference.py` — CI-only: PR must reference an In-Progress CP (not run by run_all)
 
 Run all local checks:
 ```bash
@@ -66,12 +62,10 @@ python3 harness/checks/run_all.py
 
 ```
 harness/
-├── README.md              # This file
-├── constitution.md        # Non-negotiable principles
+├── README.md             # This file
+├── constitution.md       # Non-negotiable principles
 ├── stack.md              # Technology stack documentation
 ├── workflow/
-│   ├── lifecycle.md      # CP states and transitions
-│   ├── roles.md          # Author, Reviewer, Approver, Implementer
 │   ├── agent-protocol.md # Rules for coding agents
 │   └── definition-of-done.md
 ├── standards/
@@ -82,16 +76,6 @@ harness/
 │   ├── git.md            # Branching, commits, PRs
 │   ├── docs.md           # Documentation standards
 │   └── observability.md  # Logging, metrics
-├── templates/
-│   ├── proposal.md       # Proposal template
-│   ├── spec.md           # Specification template
-│   └── plan.md           # Implementation plan template
-├── prompts/
-│   ├── 01-draft-proposal.md
-│   ├── 02-write-spec.md
-│   ├── 03-write-plan.md
-│   ├── 04-implement-task.md
-│   └── 05-review-implementation.md
 └── checks/
     ├── README.md         # Index of available checks
     └── [executable scripts]

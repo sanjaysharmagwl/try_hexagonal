@@ -9,30 +9,44 @@
 
 # Usage
 
-A hexagonal-architecture FastAPI + Pydantic app (`app/`, `main.py`) governed by a Change Proposal (CP) workflow.
+A hexagonal-architecture FastAPI + Pydantic app (`app/`, `main.py`) governed by an OpenSpec spec-driven workflow.
 
-## CP workflow in 5 lines
+## OpenSpec workflow in 5 lines
 
-1. Non-trivial changes need a CP: `python3 tools/cp/cp new "<title>"`
-2. Lifecycle: Draft -> Proposed -> Accepted -> Specified -> Spec-Approved -> Planned -> In-Progress -> Implemented -> Closed
-3. Gates G1-G4 are human approvals recorded via `cp status <id> <state> --by <name>`
-4. Trivial changes (see harness/workflow/lifecycle.md) skip the CP but carry the `trivial` PR label
-5. Worked example: `proposals/0001-adopt-change-proposal-process/`
+1. Non-trivial changes need an OpenSpec change: propose via the `openspec-propose` skill (`.agents/skills/`), which writes `proposal.md`, `design.md`, spec deltas, and `tasks.md` under `openspec/changes/<name>/`
+2. Implement via the `openspec-apply-change` skill: one `tasks.md` item at a time, check off `- [x]`, commit per task
+3. Archive via the `openspec-archive-change` skill (`openspec archive <change>`), which merges delta specs into `openspec/specs/`
+4. Trivial changes (see harness/constitution.md) skip the OpenSpec change but must still pass all checks
+5. Baseline spec: `openspec/specs/ideas/spec.md`
+
+## OpenSpec CLI
+
+Install: `npm i -g @fission-ai/openspec@1.15.0` — the skills invoke `openspec` from PATH.
+
+Key commands:
+
+```bash
+openspec list                 # list changes
+openspec list --specs         # list specs
+openspec show <change>        # inspect a change
+openspec validate --all --strict --no-interactive
+openspec archive <change>     # archive a completed change, merging its spec deltas
+```
 
 ## Read order
 
-Read `harness/README.md` first, then `harness/constitution.md`, then the `harness/standards/` files relevant to the task.
+Read `harness/README.md` first, then `harness/constitution.md`, then the `harness/standards/` files relevant to the task, then the change's `proposal.md`/`design.md`/spec deltas/`tasks.md`.
 
 ## Agent protocol (summary — full rules in harness/workflow/agent-protocol.md)
 
 1. Follow the read order above before any task
-2. Implement only tasks whose CP status is `In-Progress`
-3. One task at a time; commit per task referencing CP-XXXX, T-YYY, REQ-ZZZ (format: harness/standards/git.md)
-4. Ambiguity -> STOP, log a Spec Amendment Request in log.md, ask a human
-5. Never edit approved proposal.md/spec.md — amendments only, human-approved
-6. Run all harness checks before done; paste results in log.md
-7. Stay within the plan's "Files in Scope" or log why
-8. Never fabricate results; never pass `--by` for a gate on your own work
+2. Implement only tasks listed in a change's `tasks.md`
+3. One task at a time; check it off; commit per task referencing the change name (format: harness/standards/git.md)
+4. Ambiguity -> STOP, ask a human; record the resolution in the change's artifacts
+5. Never edit `openspec/specs/` or archived changes directly — specs change only via `openspec archive`
+6. Run all checks before done
+7. Stay within the change's scope
+8. Never fabricate results
 
 ## Checks
 
@@ -40,6 +54,6 @@ Read `harness/README.md` first, then `harness/constitution.md`, then the `harnes
 uv run ruff format --check .
 uv run ruff check .
 uv run pytest
-python3 tools/cp/cp lint
+openspec validate --all --strict --no-interactive
 python3 harness/checks/run_all.py
 ```
