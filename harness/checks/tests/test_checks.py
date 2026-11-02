@@ -76,5 +76,3 @@ def test_secrets_violation(tmp_path):
 def test_secrets_password(tmp_path):
     (tmp_path / "a.py").write_text('password = "supersecretpw"\n')
     assert check_secrets.check(tmp_path)
-
-
