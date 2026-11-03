@@ -1,42 +1,57 @@
-# Idea Management System - Hexagonal Architecture
+# Idea Management System
 
-A clean hexagonal architecture implementation using uv workspace pattern and Pydantic for domain modeling.
+AI-Native app easy for an agent to understand, run and verify.
+
+A feature-sliced layered FastAPI app in a uv workspace: business logic in `packages/core`, HTTP in `apps/api`.
 
 ## Project Structure
 
 ```
 try_hexagonal/
-├── pyproject.toml              # Project configuration
-├── main.py                     # Composition root (app entry point)
-├── app/
-│   ├── core/                   # Shared dependencies
-│   └── ideas/                  # Ideas feature (models, service, repository, router, schemas)
-└── tests/
-    └── unit/                   # Domain tests
+├── pyproject.toml              # uv workspace root (tooling config)
+├── justfile                    # just check = the definition of done
+├── apps/
+│   └── api/
+│       ├── src/api/
+│       │   ├── main.py         # create_app() + app; includes routers
+│       │   ├── deps.py         # Depends providers (wiring)
+│       │   └── ideas/          # HTTP slice: router.py, schemas.py
+│       └── tests/              # API tests (TestClient + dependency_overrides)
+├── packages/
+│   └── core/
+│       ├── src/core/ideas/     # models.py, service.py, repository.py
+│       └── tests/              # domain + service tests
+├── docs/                       # standards, workflow, checks (was harness/)
+└── openspec/                   # spec-driven workflow
 ```
 
-## Setup with uv
+## Setup
 
 ```bash
-# Install dependencies
-uv sync
+# Install just (task runner) once:
+brew install just        # or: uv tool install rust-just
 
+just setup               # uv sync --all-packages
 ```
 
-## Running the Application
+## Run
 
 ```bash
-# Start the FastAPI server
-uv run uvicorn main:app --reload
+just dev                 # fastapi dev server at http://127.0.0.1:8000
 ```
 
-The API will be available at `http://127.0.0.1:8000`
-
-## Testing
+## Test
 
 ```bash
-# Run domain tests
-uv run pytest
+just test                # all tests
+just test -k submission  # subset
+just cov                 # with coverage
+```
+
+## Done
+
+```bash
+just check               # lint, types, arch boundaries, tests, spec, docs/checks
 ```
 
 ## API Usage
@@ -64,7 +79,12 @@ Response:
 
 ## Architecture
 
-- **Domain**: Core business logic (Idea entity, errors)
-- **Application**: Use cases and ports (protocols)
-- **Adapters**: HTTP routes, persistence implementations
-- **Composition Root**: main.py wires everything together
+Feature-sliced layers; dependencies flow downward only:
+
+- **router** (`apps/api`) — HTTP only: validation wiring, status codes, response shaping
+- **schemas** (`apps/api`) — Pydantic request/response DTOs
+- **service** (`packages/core`) — business rules; plain class, no FastAPI
+- **repository** (`packages/core`) — persistence Protocol + implementation
+- **models** (`packages/core`) — domain entities and errors
+
+Boundaries are enforced by import-linter (`just arch`). See `docs/standards/architecture.md` and `docs/architecture.md` (ADR-001).

@@ -17,11 +17,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: uv sync --locked
-      - run: uv run ruff format --check .
-      - run: uv run ruff check .
-      - run: uv run pytest --cov=app --cov-report=term-missing
-      - run: npx -y @fission-ai/openspec@1.15.0 validate --all --strict --no-interactive
-        env:
-          OPENSPEC_TELEMETRY: "0"
-      - run: uv run python harness/checks/run_all.py
+      - uses: extractions/setup-just@v4
+      - run: uv sync --all-packages --locked
+      - run: just lint types arch cov spec harness

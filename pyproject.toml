@@ -1,19 +1,24 @@
 [project]
-name = "idea-management"
+name = "idea-management-workspace"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = [
-    "fastapi",
-    "pydantic",
-    "uvicorn",
-]
+dependencies = []
 
 [dependency-groups]
 dev = [
     "pytest",
-    "pytest-cov>=7.1.0",
+    "pytest-cov",
     "ruff>=0.17.3",
+    "pyright",
+    "import-linter",
 ]
+
+[tool.uv.workspace]
+members = ["apps/*", "packages/*"]
+
+[tool.uv.sources]
+core = { workspace = true }
+api = { workspace = true }
 
 [tool.ruff]
 line-length = 100
@@ -25,9 +30,39 @@ ignore = ["B008"]  # FastAPI Depends() in defaults is idiomatic
 
 [tool.ruff.lint.per-file-ignores]
 # Style-only modernization suppressed: no application behavior changes allowed.
-"app/ideas/models.py" = ["UP042"]
-"app/ideas/router.py" = ["B904"]
+"packages/core/src/core/ideas/models.py" = ["UP042"]
+"apps/api/src/api/ideas/router.py" = ["B904"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "harness/checks/tests"]
-pythonpath = ["."]
+addopts = "--import-mode=importlib"
+testpaths = ["apps/api/tests", "packages/core/tests", "docs/checks/tests"]
+
+[tool.pyright]
+include = ["apps", "packages"]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
+
+[tool.importlinter]
+root_packages = ["core", "api"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "core must not depend on api or web frameworks"
+type = "forbidden"
+source_modules = ["core"]
+forbidden_modules = ["api", "fastapi", "starlette"]
+
+[[tool.importlinter.contracts]]
+name = "api feature layers: router -> service/schemas, never repository"
+type = "forbidden"
+source_modules = ["api.ideas.router"]
+forbidden_modules = ["core.ideas.repository"]
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "core feature layers flow downward"
+type = "layers"
+containers = ["core.ideas"]
+layers = ["service", "repository", "models"]

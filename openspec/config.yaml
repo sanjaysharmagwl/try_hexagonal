@@ -2,12 +2,13 @@ schema: spec-driven
 
 # Project context
 context: |
-  Python 3.12 project managed with uv.
-  FastAPI + Pydantic application following hexagonal architecture
-  (domain, application use cases, adapters wired in the composition root).
-  Layering rules live in harness/standards/architecture.md and are
-  enforced by harness/checks.
-  The non-negotiable principles are in harness/constitution.md.
+  Python 3.12 uv workspace.
+  Feature-sliced layered FastAPI app: business logic in packages/core
+  (models, service, repository — no web framework), HTTP in apps/api
+  (routers, schemas, deps, main). Wired via FastAPI Depends providers.
+  Layering rules live in docs/standards/architecture.md and are
+  enforced by import-linter (just arch) plus docs/checks.
+  The non-negotiable principles are in docs/constitution.md.
   Tests use pytest.
   Do not add new dependencies without a change that justifies them.
 
@@ -20,4 +21,4 @@ rules:
     - Every requirement has at least one WHEN/THEN scenario
   tasks:
     - Each task is small and includes its tests
-    - The final task runs the repo checks: ruff format --check, ruff check, pytest, openspec validate --all --strict, harness/checks/run_all.py
+    - The final task runs the repo checks: just check

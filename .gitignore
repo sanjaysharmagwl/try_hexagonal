@@ -44,3 +44,5 @@ htmlcov/
 Thumbs.db
 
 # uv
+.ruff_cache/
+.import_linter_cache/

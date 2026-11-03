@@ -9,19 +9,19 @@
 
 # Usage
 
-A hexagonal-architecture FastAPI + Pydantic app (`app/`, `main.py`) governed by an OpenSpec spec-driven workflow.
+A feature-sliced layered FastAPI app in a uv workspace — business logic in `packages/core` (models, service, repository; no web framework), HTTP in `apps/api` (routers, schemas, deps, main) — governed by an OpenSpec spec-driven workflow.
 
 ## OpenSpec workflow in 5 lines
 
 1. Non-trivial changes need an OpenSpec change: propose via the `openspec-propose` skill (`.agents/skills/`), which writes `proposal.md`, `design.md`, spec deltas, and `tasks.md` under `openspec/changes/<name>/`
 2. Implement via the `openspec-apply-change` skill: one `tasks.md` item at a time, check off `- [x]`, commit per task
 3. Archive via the `openspec-archive-change` skill (`openspec archive <change>`), which merges delta specs into `openspec/specs/`
-4. Trivial changes (see harness/constitution.md) skip the OpenSpec change but must still pass all checks
+4. Trivial changes (see docs/constitution.md) skip the OpenSpec change but must still pass all checks
 5. Baseline spec: `openspec/specs/ideas/spec.md`
 
 ## OpenSpec CLI
 
-Install: `npm i -g @fission-ai/openspec@1.15.0` — the skills invoke `openspec` from PATH.
+The justfile invokes the CLI via pinned `npx -y @fission-ai/openspec@1.15.0`, so a global install is optional (`npm i -g @fission-ai/openspec@1.15.0` if you want `openspec` on PATH).
 
 Key commands:
 
@@ -35,13 +35,13 @@ openspec archive <change>     # archive a completed change, merging its spec del
 
 ## Read order
 
-Read `harness/README.md` first, then `harness/constitution.md`, then the `harness/standards/` files relevant to the task, then the change's `proposal.md`/`design.md`/spec deltas/`tasks.md`.
+Read `docs/README.md` first, then `docs/constitution.md`, then the `docs/standards/` files relevant to the task, then the change's `proposal.md`/`design.md`/spec deltas/`tasks.md`.
 
-## Agent protocol (summary — full rules in harness/workflow/agent-protocol.md)
+## Agent protocol (summary — full rules in docs/workflow/agent-protocol.md)
 
 1. Follow the read order above before any task
 2. Implement only tasks listed in a change's `tasks.md`
-3. One task at a time; check it off; commit per task referencing the change name (format: harness/standards/git.md)
+3. One task at a time; check it off; commit per task referencing the change name (format: docs/standards/git.md)
 4. Ambiguity -> STOP, ask a human; record the resolution in the change's artifacts
 5. Never edit `openspec/specs/` or archived changes directly — specs change only via `openspec archive`
 6. Run all checks before done
@@ -51,9 +51,6 @@ Read `harness/README.md` first, then `harness/constitution.md`, then the `harnes
 ## Checks
 
 ```bash
-uv run ruff format --check .
-uv run ruff check .
-uv run pytest
-openspec validate --all --strict --no-interactive
-python3 harness/checks/run_all.py
+just check     # the one command that means "done"
+just --list    # discover recipes: dev, test -k ..., lint, types, arch, spec, harness
 ```
